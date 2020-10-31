@@ -1,6 +1,6 @@
 # Rate Limit
 
-### Quick start
+## Quick start
 ```bash
 # build
 ./scripts/build.sh
@@ -15,7 +15,7 @@
 curl http://localhost:8080
 ```
 
-### 1. Structure
+## 1. Structure
 ```
 .
 ├── README.md
@@ -32,7 +32,7 @@ curl http://localhost:8080
 
 `src` source code of rate limit server.
 
-### 2. Source
+## 2. Source
 note: `go.mod` and `go.sum` are ignored.
 
 ```
@@ -61,7 +61,7 @@ note: `go.mod` and `go.sum` are ignored.
 
 `server/` the entry point of the server.
 
-### 3. Description
+## 3. Description
 
 The `ratelimit` package implements a service with rate limiting functionality.
 
@@ -69,8 +69,7 @@ For simplicity,
 1. `ratelimit` server uses in-memory data structure to keep track of the number of requests each user made within 60 second.
 2. HTTP server directly serves all incoming HTTP traffic to port `8080`, i.e., no routing. 
 
-
-#### `RateLimitHandler`
+### `RateLimitHandler`
 
 `RateLimitHandler` is the struct that handles the request. It implements `ServeHTTP` so that it can be passed to `http.Server` as a `http.Handler`.
 
@@ -107,3 +106,22 @@ After that, it then calculate the start time `start`, which is the unix timestam
 Now `Record` will know how many request is made within the past `window` second. If it exceeds `limit`, return an error. Else, return the number of request within `window` second + 1 (the current request).
 
 On the other hand, the records that are before `start` are no longer needed, `timestamp` will be sliced to save space.
+
+## 4. Test
+
+All test can be found in the test files.
+
+### `config_test.go`
+- `TestConfigPort` test invalid port value.
+- `TestConfigLimit` test invalid limit value.
+- `TestConfigWindow` test invalid window value.
+
+### `record_test.go`
+- `TestNewRecord` test creating a new record.
+- `TestAdd` test adding timestamp in record until it exceeds the limit.
+
+### `impl_test.go`
+- `TestQueryOne` test making one query to server.
+- `TestQueryRepeat` test making request in a fair time interval so that the limit will not be exceeded.
+- `TestQueryFromDifferentIP` test make request from different IP, so that the record is saved on different hashmap key, and the limit will not be exceeded.
+- `TestQueryConcurrentRepeat` test making request concurrently, only the `limit` requests will be served, the rest will get `429`.
