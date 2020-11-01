@@ -1,5 +1,7 @@
 # Rate Limit
 
+A middleware version is in https://github.com/ToastCheng/ratelimiter
+
 ## Quick start
 ```bash
 # build
